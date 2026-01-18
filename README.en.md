@@ -10,7 +10,7 @@ A network speed monitoring tool. Measures speed at regular intervals and provide
 After switching to Nuro Hikari, I noticed occasional stuttering while using WiFi, which led to high latency or unexpected router reboots. Since contacting support didn't yield immediate results, I created this tool to periodically connect to the network and measure the speed to track stability.
 
 ## Features
-- 🚀 **Automatic Measurement**: Automatically measures speed at specified intervals (default: 15 minutes).
+- 🚀 **Automatic Measurement**: Automatically measures speed at specified intervals (Default: 20 minutes).
 - 📊 **Visualization**: Easy-to-read charts using Chart.js.
 - 💎 **Modern UI**: Premium dark theme with glassmorphism design.
 - 🐍 **Easy Setup**: Includes an installer for Raspberry Pi.

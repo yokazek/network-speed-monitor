@@ -11,7 +11,7 @@ app = FastAPI(title="NetChecker")
 
 # --- 設定 ---
 # 測定間隔 (1時間ごとに計測する場合は hours=1, 30分ごとの場合は minutes=30 と書けます)
-CHECK_INTERVAL = {"minutes": 15} 
+CHECK_INTERVAL = {"minutes": 20} 
 # -----------
 
 # データベース初期化
