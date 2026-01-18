@@ -331,7 +331,20 @@ async function fetchLogs() {
         const response = await fetch('/api/logs');
         const data = await response.json();
         const viewer = document.getElementById('log-viewer');
-        viewer.innerText = data.logs;
+
+        const lines = data.logs.split('\n');
+        const html = lines.map(line => {
+            if (!line.trim()) return '';
+            let typeClass = 'log-info';
+            if (line.includes('ERROR')) typeClass = 'log-error';
+            else if (line.includes('WARNING')) typeClass = 'log-warning';
+
+            // 特殊文字のエスケープ（簡易）
+            const escapedLine = line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return `<span class="log-line ${typeClass}">${escapedLine}</span>`;
+        }).join('');
+
+        viewer.innerHTML = html;
         // 一番下にスクロール
         viewer.scrollTop = viewer.scrollHeight;
     } catch (error) {

@@ -305,18 +305,43 @@ tr:hover td {
 }
 
 #log-viewer {
-    background: #000;
-    color: #4ade80;
-    padding: 1.5rem;
+    background: #0a0f1d;
+    color: #e2e8f0;
+    padding: 1rem;
     border-radius: 16px;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'DM Mono', 'Fira Code', monospace;
     font-size: 0.85rem;
-    line-height: 1.6;
-    height: 300px;
+    line-height: 1.5;
+    height: 350px;
     overflow-y: auto;
     border: 1px solid var(--glass-border);
     white-space: pre-wrap;
     word-break: break-all;
+}
+
+.log-line {
+    display: block;
+    margin-bottom: 2px;
+}
+
+.log-error {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+    border-left: 3px solid #f87171;
+    padding-left: 8px;
+}
+
+.log-warning {
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.1);
+    border-left: 3px solid #fbbf24;
+    padding-left: 8px;
+}
+
+.log-info {
+    color: #4ade80;
+    border-left: 3px solid transparent;
+    padding-left: 11px;
 }
 
 .outline-button {
