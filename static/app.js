@@ -31,7 +31,8 @@ function initChart() {
                     data: [],
                     borderWidth: 3,
                     tension: 0.4,
-                    fill: true
+                    fill: true,
+                    yAxisID: 'y'
                 },
                 {
                     label: 'Upload (Mbps)',
@@ -40,13 +41,29 @@ function initChart() {
                     data: [],
                     borderWidth: 3,
                     tension: 0.4,
-                    fill: true
+                    fill: true,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Ping (ms)',
+                    borderColor: '#f472b6',
+                    backgroundColor: 'transparent',
+                    data: [],
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    tension: 0.4,
+                    fill: false,
+                    yAxisID: 'y1'
                 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
             plugins: {
                 legend: {
                     labels: { color: '#94a3b8', font: { family: 'Inter' } }
@@ -58,8 +75,21 @@ function initChart() {
                     ticks: { color: '#94a3b8' }
                 },
                 y: {
-                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: { display: true, text: 'Speed (Mbps)', color: '#94a3b8' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
                     ticks: { color: '#94a3b8' }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: { display: true, text: 'Ping (ms)', color: '#f472b6' },
+                    grid: { drawOnChartArea: false },
+                    ticks: { color: '#f472b6' },
+                    min: 0
                 }
             }
         }
@@ -88,18 +118,24 @@ function updateDashboard(data) {
 
     // グラフの更新 (昇順にする必要がある)
     const chartData = [...data].reverse();
-    speedChart.data.labels = chartData.map(d => new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    // タイムゾーン補正: SQLiteの文字列に ' UTC' を付加して Date オブジェクトを作成
+    speedChart.data.labels = chartData.map(d => {
+        const date = new Date(d.timestamp + " UTC");
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    });
     speedChart.data.datasets[0].data = chartData.map(d => d.download);
     speedChart.data.datasets[1].data = chartData.map(d => d.upload);
+    speedChart.data.datasets[2].data = chartData.map(d => d.ping);
     speedChart.update();
 
     // テーブルの更新
     const tbody = document.querySelector('#table-history tbody');
     tbody.innerHTML = '';
     data.forEach(d => {
+        const date = new Date(d.timestamp + " UTC");
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${new Date(d.timestamp).toLocaleString()}</td>
+            <td>${date.toLocaleString()}</td>
             <td>${d.download.toFixed(2)} Mbps</td>
             <td>${d.upload.toFixed(2)} Mbps</td>
             <td>${d.ping.toFixed(1)} ms</td>
