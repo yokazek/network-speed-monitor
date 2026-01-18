@@ -11,7 +11,7 @@ app = FastAPI(title="NetChecker")
 
 # --- 設定 ---
 # 測定間隔 (1時間ごとに計測する場合は hours=1, 30分ごとの場合は minutes=30 と書けます)
-CHECK_INTERVAL = {"hours": 1} 
+CHECK_INTERVAL = {"minutes": 15} 
 # -----------
 
 # データベース初期化
@@ -53,6 +53,22 @@ async def get_logs():
         # 直近の100行を返す
         lines = f.readlines()
         return {"logs": "".join(lines[-100:])}
+
+@app.delete("/api/history")
+async def delete_history():
+    """履歴をすべて削除"""
+    from database import clear_history
+    clear_history()
+    return {"message": "All history deleted"}
+
+@app.delete("/api/logs")
+async def delete_logs():
+    """ログをクリア"""
+    if os.path.exists("netchecker.log"):
+        # ファイルを空にする
+        with open("netchecker.log", "w", encoding="utf-8") as f:
+            f.write("")
+    return {"message": "Logs cleared"}
 
 @app.get("/api/status")
 async def get_status():

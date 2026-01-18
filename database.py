@@ -40,6 +40,13 @@ def get_history(limit: int = 50):
         )
         return [dict(row) for row in cursor.fetchall()]
 
+def clear_history():
+    """すべての履歴を削除"""
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM speed_tests")
+        conn.commit()
+
 if __name__ == "__main__":
     init_db()
     print("Database initialized.")

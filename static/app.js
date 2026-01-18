@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-test').addEventListener('click', startManualTest);
     document.getElementById('btn-refresh-logs').addEventListener('click', fetchLogs);
+    document.getElementById('btn-clear-history').addEventListener('click', clearHistory);
+    document.getElementById('btn-clear-logs').addEventListener('click', clearLogs);
 
     // 1分ごとにデータを更新
     setInterval(() => {
@@ -148,5 +150,25 @@ async function fetchLogs() {
         viewer.scrollTop = viewer.scrollHeight;
     } catch (error) {
         console.error('Error fetching logs:', error);
+    }
+}
+
+async function clearHistory() {
+    if (!confirm('全ての測定履歴を削除しますか？')) return;
+    try {
+        await fetch('/api/history', { method: 'DELETE' });
+        fetchData(); // 画面を更新
+    } catch (error) {
+        console.error('Error clearing history:', error);
+    }
+}
+
+async function clearLogs() {
+    if (!confirm('システムログをクリアしますか？')) return;
+    try {
+        await fetch('/api/logs', { method: 'DELETE' });
+        fetchLogs(); // 画面を更新
+    } catch (error) {
+        console.error('Error clearing logs:', error);
     }
 }
