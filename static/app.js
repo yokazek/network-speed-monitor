@@ -164,22 +164,6 @@ function updateDashboard(data) {
     }
 
     updateBrushUI();
-
-    // テーブルの更新
-    const tbody = document.querySelector('#table-history tbody');
-    tbody.innerHTML = '';
-    data.forEach(d => {
-        const date = new Date(d.timestamp + " UTC");
-        const tr = document.createElement('tr');
-        const formatValue = (val, unit) => (val === null || val === undefined) ? `<span class="error-text">Error</span>` : `${val.toFixed(val >= 10 ? 1 : 2)} ${unit}`;
-        tr.innerHTML = `
-            <td>${date.toLocaleString()}</td>
-            <td>${formatValue(d.download, 'Mbps')}</td>
-            <td>${formatValue(d.upload, 'Mbps')}</td>
-            <td>${formatValue(d.ping, 'ms')}</td>
-        `;
-        tbody.appendChild(tr);
-    });
 }
 
 function setDefaultRange() {
