@@ -129,9 +129,12 @@ function updateDashboard(data) {
 
     // 最新のデータをカードに反映
     const latest = data[0];
-    document.querySelector('#card-download .value').innerHTML = `${latest.download.toFixed(1)} <span class="unit">Mbps</span>`;
-    document.querySelector('#card-upload .value').innerHTML = `${latest.upload.toFixed(1)} <span class="unit">Mbps</span>`;
-    document.querySelector('#card-ping .value').innerHTML = `${Math.round(latest.ping)} <span class="unit">ms</span>`;
+    const formatValue = (val, dec = 1) => (val !== null && val !== undefined) ? val.toFixed(dec) : '--';
+    const formatPing = (val) => (val !== null && val !== undefined) ? Math.round(val) : '--';
+
+    document.querySelector('#card-download .value').innerHTML = `${formatValue(latest.download)} <span class="unit">Mbps</span>`;
+    document.querySelector('#card-upload .value').innerHTML = `${formatValue(latest.upload)} <span class="unit">Mbps</span>`;
+    document.querySelector('#card-ping .value').innerHTML = `${formatPing(latest.ping)} <span class="unit">ms</span>`;
 
     // グラフデータの準備
     const labels = chartDataRaw.map(d => {
