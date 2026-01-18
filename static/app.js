@@ -1,13 +1,18 @@
-let speedChart;
+﻿let speedChart;
 
 document.addEventListener('DOMContentLoaded', () => {
     initChart();
     fetchData();
+    fetchLogs();
 
     document.getElementById('btn-test').addEventListener('click', startManualTest);
+    document.getElementById('btn-refresh-logs').addEventListener('click', fetchLogs);
 
     // 1分ごとにデータを更新
-    setInterval(fetchData, 60000);
+    setInterval(() => {
+        fetchData();
+        fetchLogs();
+    }, 60000);
 });
 
 function initChart() {
@@ -63,7 +68,7 @@ async function fetchData() {
     try {
         const response = await fetch('/api/history');
         const data = await response.json();
-        
+
         if (data.length > 0) {
             updateDashboard(data);
         }
@@ -81,7 +86,7 @@ function updateDashboard(data) {
 
     // グラフの更新 (昇順にする必要がある)
     const chartData = [...data].reverse();
-    speedChart.data.labels = chartData.map(d => new Date(d.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
+    speedChart.data.labels = chartData.map(d => new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
     speedChart.data.datasets[0].data = chartData.map(d => d.download);
     speedChart.data.datasets[1].data = chartData.map(d => d.upload);
     speedChart.update();
@@ -104,14 +109,14 @@ function updateDashboard(data) {
 async function startManualTest() {
     const btn = document.getElementById('btn-test');
     const status = document.getElementById('status-message');
-    
+
     btn.disabled = true;
     status.innerText = '測定中... (これには1分ほどかかる場合があります)';
-    
+
     try {
         const response = await fetch('/api/test', { method: 'POST' });
         const result = await response.json();
-        
+
         // 測定はバックグラウンドで行われるため、少し待ってからデータを再取得
         // 実際にはポーリングなどで状態を確認するのがベストだが、簡易化のため10秒おきに数回チェック
         let attempts = 0;
@@ -130,5 +135,18 @@ async function startManualTest() {
         console.error('Error starting test:', error);
         btn.disabled = false;
         status.innerText = 'エラーが発生しました。';
+    }
+}
+
+async function fetchLogs() {
+    try {
+        const response = await fetch('/api/logs');
+        const data = await response.json();
+        const viewer = document.getElementById('log-viewer');
+        viewer.innerText = data.logs;
+        // 一番下にスクロール
+        viewer.scrollTop = viewer.scrollHeight;
+    } catch (error) {
+        console.error('Error fetching logs:', error);
     }
 }

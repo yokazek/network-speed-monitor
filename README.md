@@ -1,4 +1,4 @@
-# NetChecker
+﻿# NetChecker
 
 Raspberry Pi 上で動作するネットワーク速度測定ツールです。一定間隔で速度を計測し、モダンな Web ダッシュボードで履歴を確認できます。
 
@@ -8,7 +8,7 @@ Raspberry Pi 上で動作するネットワーク速度測定ツールです。�
 - 💎 **モダン UI**: 高級感のあるダークテーマとグラスモーフィズムデザイン。
 - 🐍 **簡単セットアップ**: ラズパイ向けインストーラーを同梱。
 
-## セットアップ (Raspberry Pi)
+## セットアップ (Raspberry Pi / Linux)
 
 ```bash
 # クローンまたはコピー後、ディレクトリに移動
@@ -22,6 +22,13 @@ chmod +x install.sh run.sh
 
 # 起動
 ./run.sh
+```
+
+## セットアップ (Windows)
+
+```powershell
+.\setup_windows.ps1
+.\run_windows.ps1
 ```
 
 起動後、ブラウザで `http://[ラズパイのIPアドレス]:8080` にアクセスしてください。

@@ -1,9 +1,16 @@
-import speedtest
+﻿import speedtest
 from database import save_result
 import logging
 
 # ロギング設定
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("netchecker.log"),
+        logging.StreamHandler()
+    ]
+)
 logger = logging.getLogger(__name__)
 
 def run_speed_test():

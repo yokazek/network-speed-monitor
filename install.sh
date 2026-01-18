@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 # NetChecker Installer for Raspberry Pi
 

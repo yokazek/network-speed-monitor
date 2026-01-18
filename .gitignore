@@ -1,4 +1,4 @@
-# Byte-compiled / optimized / DLL files
+﻿# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
@@ -19,3 +19,4 @@ env/
 # OS files
 .DS_Store
 Thumbs.db
+*.log

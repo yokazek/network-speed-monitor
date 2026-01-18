@@ -1,4 +1,4 @@
-from fastapi import FastAPI, BackgroundTasks
+﻿from fastapi import FastAPI, BackgroundTasks
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -43,6 +43,16 @@ async def trigger_speed_test(background_tasks: BackgroundTasks):
     # 非同期で実行してすぐにレスポンスを返す
     background_tasks.add_task(run_speed_test)
     return {"message": "Speed test started in background"}
+
+@app.get("/api/logs")
+async def get_logs():
+    """最新のログを返す"""
+    if not os.path.exists("netchecker.log"):
+        return {"logs": "ログファイルがまだ作成されていません。"}
+    with open("netchecker.log", "r", encoding="utf-8") as f:
+        # 直近の100行を返す
+        lines = f.readlines()
+        return {"logs": "".join(lines[-100:])}
 
 @app.get("/api/status")
 async def get_status():

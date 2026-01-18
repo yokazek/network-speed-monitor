@@ -1,5 +1,6 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,12 @@
     <link rel="stylesheet" href="/static/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -43,23 +47,18 @@
 
         <section class="history-list">
             <h2>履歴</h2>
-            <div class="table-container">
-                <table id="table-history">
-                    <thead>
-                        <tr>
-                            <th>日時</th>
-                            <th>Download</th>
-                            <th>Upload</th>
-                            <th>Ping</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- 履歴データが入ります -->
-                    </tbody>
-                </table>
+            <!-- ... 既存のテーブル ... -->
+        </section>
+
+        <section class="logs-container">
+            <div class="logs-header">
+                <h2>システムログ</h2>
+                <button id="btn-refresh-logs" class="outline-button">更新</button>
             </div>
+            <pre id="log-viewer">ログを読み込み中...</pre>
         </section>
     </div>
     <script src="/static/app.js"></script>
 </body>
+
 </html>
