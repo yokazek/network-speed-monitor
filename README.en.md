@@ -11,7 +11,8 @@ After switching to Nuro Hikari, I noticed occasional stuttering while using WiFi
 
 ## Features
 - 🚀 **Automatic Measurement**: Automatically measures speed at specified intervals (Default: 20 minutes).
-- 📊 **Visualization**: Easy-to-read charts using Chart.js.
+- 📊 **Visualization**: Real-time charts on the dashboard and historical charts for past trends.
+- 📅 **History View**: Browse past measurement data by selecting a date from a calendar.
 - 💎 **Modern UI**: Premium dark theme with glassmorphism design.
 - 🐍 **Easy Setup**: Includes an installer for Raspberry Pi.
 
@@ -41,10 +42,12 @@ chmod +x install.sh run.sh
 After starting, access `http://[RasPi-IP-Address]:8080` in your browser.
 
 ## Settings
-You can adjust the measurement interval by changing `CHECK_INTERVAL` at the top of `main.py`.
+You can adjust the measurement interval and server settings by changing constants in `config.py`.
 
 ```python
+# config.py
 CHECK_INTERVAL = {"minutes": 30}  # Example: every 30 minutes
+PORT = 8080                       # Server port
 ```
 
 ## Tech Stack

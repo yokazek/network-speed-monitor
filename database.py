@@ -1,8 +1,7 @@
 ﻿import sqlite3
 import os
 from datetime import datetime
-
-DB_PATH = "netchecker.db"
+from config import DB_PATH
 
 def init_db():
     """データベースとテーブルの初期化"""

@@ -1,13 +1,14 @@
 ﻿import speedtest
 from database import save_result
 import logging
+from config import LOG_PATH
 
 # ロギング設定
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler("netchecker.log"),
+        logging.FileHandler(LOG_PATH),
         logging.StreamHandler()
     ]
 )

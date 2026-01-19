@@ -1,9 +1,10 @@
-﻿let speedChart;
+import { api } from './api.js';
+import { formatValue, formatPing, formatTime, escapeHtml } from './utils.js';
+import { getCommonDatasets, getChartOptions } from './chart-config.js';
+
+let speedChart;
 let navChart;
 let chartDataRaw = [];
-let isDragging = false;
-let startX;
-let scrollLeft;
 
 document.addEventListener('DOMContentLoaded', () => {
     initCharts();
@@ -26,79 +27,20 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initCharts() {
-    const commonDatasets = [
-        {
-            label: 'Download (Mbps)',
-            borderColor: '#38bdf8',
-            backgroundColor: 'rgba(56, 189, 248, 0.1)',
-            borderWidth: 3,
-            tension: 0.4,
-            fill: true,
-            yAxisID: 'y'
-        },
-        {
-            label: 'Upload (Mbps)',
-            borderColor: '#4ade80',
-            backgroundColor: 'rgba(74, 222, 128, 0.1)',
-            borderWidth: 3,
-            tension: 0.4,
-            fill: true,
-            yAxisID: 'y'
-        },
-        {
-            label: 'Ping (ms)',
-            borderColor: '#f472b6',
-            backgroundColor: 'transparent',
-            borderWidth: 2,
-            borderDash: [5, 5],
-            tension: 0.4,
-            fill: false,
-            yAxisID: 'y1'
-        }
-    ];
-
     // メイングラフ
     const ctx = document.getElementById('speedChart').getContext('2d');
     speedChart = new Chart(ctx, {
         type: 'line',
-        data: { labels: [], datasets: commonDatasets.map(ds => ({ ...ds, data: [] })) },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: {
-                legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } }
-            },
-            scales: {
-                x: {
-                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                    ticks: { color: '#94a3b8' }
-                },
-                y: {
-                    type: 'linear', display: true, position: 'left',
-                    title: { display: true, text: 'Speed (Mbps)', color: '#94a3b8' },
-                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                    ticks: { color: '#94a3b8' }
-                },
-                y1: {
-                    type: 'linear', display: true, position: 'right',
-                    title: { display: true, text: 'Ping (ms)', color: '#f472b6' },
-                    grid: { drawOnChartArea: false },
-                    ticks: { color: '#f472b6' },
-                    min: 0
-                }
-            }
-        }
+        data: { labels: [], datasets: getCommonDatasets() },
+        options: getChartOptions()
     });
 
     // ミニマップ用グラフ
     const navCtx = document.getElementById('navChart').getContext('2d');
     navChart = new Chart(navCtx, {
         type: 'line',
-        data: { labels: [], datasets: commonDatasets.map(ds => ({ ...ds, data: [], borderWidth: 1, fill: true })) },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
+        data: { labels: [], datasets: getCommonDatasets().map(ds => ({ ...ds, borderWidth: 1, fill: true })) },
+        options: getChartOptions({
             plugins: { legend: { display: false }, tooltip: { enabled: false } },
             scales: {
                 x: { display: false },
@@ -106,15 +48,13 @@ function initCharts() {
                 y1: { display: false }
             },
             elements: { point: { radius: 0 } }
-        }
+        })
     });
 }
 
 async function fetchData() {
     try {
-        const response = await fetch('/api/history');
-        const data = await response.json();
-
+        const data = await api.fetchHistory();
         if (data.length > 0) {
             updateDashboard(data);
         }
@@ -129,18 +69,12 @@ function updateDashboard(data) {
 
     // 最新のデータをカードに反映
     const latest = data[0];
-    const formatValue = (val, dec = 1) => (val !== null && val !== undefined) ? val.toFixed(dec) : '--';
-    const formatPing = (val) => (val !== null && val !== undefined) ? Math.round(val) : '--';
-
     document.querySelector('#card-download .value').innerHTML = `${formatValue(latest.download)} <span class="unit">Mbps</span>`;
     document.querySelector('#card-upload .value').innerHTML = `${formatValue(latest.upload)} <span class="unit">Mbps</span>`;
     document.querySelector('#card-ping .value').innerHTML = `${formatPing(latest.ping)} <span class="unit">ms</span>`;
 
     // グラフデータの準備
-    const labels = chartDataRaw.map(d => {
-        const date = new Date(d.timestamp + " UTC");
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    });
+    const labels = chartDataRaw.map(d => formatTime(d.timestamp));
     const downloads = chartDataRaw.map(d => d.download);
     const uploads = chartDataRaw.map(d => d.upload);
     const pings = chartDataRaw.map(d => d.ping);
@@ -184,7 +118,6 @@ function setDefaultRange() {
         }
     }
 
-    // データが少ない場合は全表示
     if (minIdx >= chartDataRaw.length - 1) minIdx = 0;
 
     speedChart.options.scales.x.min = minIdx;
@@ -302,16 +235,12 @@ async function startManualTest() {
     status.innerText = '測定中... (これには1分ほどかかる場合があります)';
 
     try {
-        const response = await fetch('/api/test', { method: 'POST' });
-        const result = await response.json();
-
-        // 測定はバックグラウンドで行われるため、少し待ってからデータを再取得
-        // 実際にはポーリングなどで状態を確認するのがベストだが、簡易化のため10秒おきに数回チェック
+        await api.startTest();
         let attempts = 0;
         const checkInterval = setInterval(async () => {
             attempts++;
             await fetchData();
-            if (attempts >= 6) { // 最大1分間チェック
+            if (attempts >= 6) {
                 clearInterval(checkInterval);
                 btn.disabled = false;
                 status.innerText = '測定が完了しました。';
@@ -328,8 +257,7 @@ async function startManualTest() {
 
 async function fetchLogs() {
     try {
-        const response = await fetch('/api/logs');
-        const data = await response.json();
+        const data = await api.fetchLogs();
         const viewer = document.getElementById('log-viewer');
 
         const lines = data.logs.split('\n');
@@ -339,13 +267,11 @@ async function fetchLogs() {
             if (line.includes('ERROR')) typeClass = 'log-error';
             else if (line.includes('WARNING')) typeClass = 'log-warning';
 
-            // 特殊文字のエスケープ（簡易）
-            const escapedLine = line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            const escapedLine = escapeHtml(line);
             return `<span class="log-line ${typeClass}">${escapedLine}</span>`;
         }).join('');
 
         viewer.innerHTML = html;
-        // 一番下にスクロール
         viewer.scrollTop = viewer.scrollHeight;
     } catch (error) {
         console.error('Error fetching logs:', error);
@@ -355,8 +281,8 @@ async function fetchLogs() {
 async function clearHistory() {
     if (!confirm('全ての測定履歴を削除しますか？')) return;
     try {
-        await fetch('/api/history', { method: 'DELETE' });
-        fetchData(); // 画面を更新
+        await api.clearHistory();
+        fetchData();
     } catch (error) {
         console.error('Error clearing history:', error);
     }
@@ -365,8 +291,8 @@ async function clearHistory() {
 async function clearLogs() {
     if (!confirm('システムログをクリアしますか？')) return;
     try {
-        await fetch('/api/logs', { method: 'DELETE' });
-        fetchLogs(); // 画面を更新
+        await api.clearLogs();
+        fetchLogs();
     } catch (error) {
         console.error('Error clearing logs:', error);
     }
