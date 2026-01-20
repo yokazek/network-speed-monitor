@@ -7,6 +7,9 @@ def init_db():
     """データベースとテーブルの初期化"""
     with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
+        # SDカードの寿命対策: WALモードの有効化と同期設定の最適化
+        cursor.execute("PRAGMA journal_mode = WAL")
+        cursor.execute("PRAGMA synchronous = NORMAL")
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS speed_tests (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,6 +33,8 @@ def save_result(download: float, upload: float, ping: float):
     """測定結果を保存"""
     with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
+        cursor.execute("PRAGMA journal_mode = WAL")
+        cursor.execute("PRAGMA synchronous = NORMAL")
         cursor.execute(
             "INSERT INTO speed_tests (download, upload, ping) VALUES (?, ?, ?)",
             (download, upload, ping)
@@ -74,6 +79,8 @@ def add_log(level: str, message: str):
     """ログをDBに保存し、古いログ（1000件超）を削除"""
     with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
+        cursor.execute("PRAGMA journal_mode = WAL")
+        cursor.execute("PRAGMA synchronous = NORMAL")
         cursor.execute(
             "INSERT INTO system_logs (level, message) VALUES (?, ?)",
             (level, message)

@@ -56,6 +56,15 @@ Designed for long-term 24/7 operation:
 - **System Logs**: Also stored in the database, but only the **latest 1000 entries** are kept. Older logs are automatically purged (rotated) to save disk space.
 - **Cleanup**: You can manually clear all history or logs at any time via the dashboard buttons.
 
+## Raspberry Pi Operation Advice (SD Card Protection)
+To reduce SD card wear on Raspberry Pi, the following optimizations are implemented by default:
+- **SQLite Optimization**: Enabled WAL mode and `synchronous=NORMAL` to significantly reduce physical write frequency.
+- **Log Management**: System logs are automatically capped at the latest 1000 entries.
+
+For maximum protection, we recommend using a **RAM disk (tmpfs)**:
+1. Change `DB_PATH` in `config.py` to `/tmp/netchecker.db` (or any path in `/tmp`).
+2. This directs all database writes to memory, preventing SD card wear (Note: Data will be lost upon reboot).
+
 ## Tech Stack
 - **Backend**: Python / FastAPI / APScheduler / SQLite
 - **Frontend**: Vanilla JS / CSS / Chart.js
