@@ -55,7 +55,20 @@ async def get_logs():
 
 @app.get("/api/status")
 async def get_status():
-    return {"status": "running", "scheduler": "active", "interval": str(CHECK_INTERVAL)}
+    jobs = scheduler.get_jobs()
+    next_run = None
+    if jobs:
+        # 最初のジョブの次回実行時刻を取得（ISO 8601 UTC形式）
+        next_run_dt = jobs[0].next_run_time
+        if next_run_dt:
+            next_run = next_run_dt.isoformat()
+            
+    return {
+        "status": "running", 
+        "scheduler": "active", 
+        "interval": str(CHECK_INTERVAL),
+        "next_run": next_run
+    }
 
 @app.delete("/api/history")
 async def delete_history():

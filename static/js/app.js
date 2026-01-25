@@ -302,12 +302,13 @@ async function clearLogs() {
 async function updateStatusInfo() {
     try {
         const data = await api.fetchStatus();
+
+        // 自動測定バッジの更新
         const badge = document.getElementById('auto-test-badge');
         if (data && data.interval) {
-            // interval format is like "{'minutes': 20}" or similar
             const intervalStr = data.interval.replace(/'/g, '"');
             try {
-                const interval = JSON.parse(intervalStr.replace(/"/g, '"'));
+                const interval = JSON.parse(intervalStr);
                 let text = '';
                 if (interval.hours) text += `${interval.hours}h `;
                 if (interval.minutes) text += `${interval.minutes}m `;
@@ -317,6 +318,20 @@ async function updateStatusInfo() {
                 badge.innerHTML = `<span class="pulse"></span> Auto-measurement: ${data.interval}`;
             }
         }
+
+        // 次回測定予定時刻の更新
+        const nextRunEl = document.getElementById('next-run-time');
+        if (data && data.next_run) {
+            const nextDate = new Date(data.next_run);
+            const formatted = nextDate.toLocaleString(undefined, {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+            nextRunEl.innerText = `次回定期測定予定: ${formatted}`;
+        } else {
+            nextRunEl.innerText = '';
+        }
+
     } catch (error) {
         console.error('Error fetching status:', error);
     }

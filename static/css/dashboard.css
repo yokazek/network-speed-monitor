@@ -17,6 +17,13 @@
     height: 1.5rem;
 }
 
+.next-run-info {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+
 .logs-container {
     margin-top: 3rem;
     margin-bottom: 5rem;
